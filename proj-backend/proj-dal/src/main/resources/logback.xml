@@ -1,0 +1,11 @@
+<configuration>
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d %level [%thread] %logger [%file:%line] ## %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="Console"/>
+    </root>
+</configuration>

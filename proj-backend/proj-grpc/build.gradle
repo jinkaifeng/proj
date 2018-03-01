@@ -1,0 +1,66 @@
+
+
+
+apply plugin: 'com.google.protobuf'
+apply plugin: 'maven'
+
+
+dependencies {
+
+    // gRPC
+    compile "io.grpc:grpc-netty:$grpc_version"
+    compile "io.grpc:grpc-protobuf:$grpc_version"
+    compile "io.grpc:grpc-stub:$grpc_version"
+
+}
+
+uploadArchives {
+    repositories.mavenLocal()
+}
+
+protobuf {
+    generatedFilesBaseDir = "${projectDir}/src/generated"
+
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.0.0"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version"
+        }
+    }
+
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {
+                option 'enable_deprecated=false'
+            }
+        }
+    }
+}
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+idea {
+    module {
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java")
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/grpc")
+    }
+}
+
+
+sourceSets {
+    main {
+        proto {
+            srcDir 'src/main/proto'
+        }
+        java {
+            srcDirs 'src/main/java', "${protobuf.generatedFilesBaseDir}/main/java", "${protobuf.generatedFilesBaseDir}/main/grpc"
+        }
+    }
+}
+
+
+project.afterEvaluate {
+    compileKotlin.dependsOn generateProto
+}

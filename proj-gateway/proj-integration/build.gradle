@@ -1,0 +1,11 @@
+dependencies {
+
+    compile project(':proj-common')
+    compile('io.peggy:peggy-core:1.1.15') {
+        changing = true
+        exclude group: "org.jetbrains.kotlin"
+    }
+    compile('com.lieluobo:proj-grpc:1.0-SNAPSHOT'){
+        exclude group: "org.jetbrains.kotlin"
+    }
+}

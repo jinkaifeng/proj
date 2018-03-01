@@ -1,0 +1,14 @@
+apply plugin: 'application'
+
+mainClassName = "com.lieluobo.proj.gateway.HttpServer"
+
+dependencies {
+
+    compile project(':proj-integration')
+
+    compile ('com.higgs.jersey:reinforcement:1.1.5'){
+        exclude group:"org.jetbrains.kotlin"
+    }
+    compile "com.google.inject.extensions:guice-servlet:${guice_version}"
+    compile group: 'io.swagger', name: 'swagger-jersey2-jaxrs', version: '1.5.15'
+}

@@ -1,0 +1,20 @@
+
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+
+mainClassName = "com.lieluobo.proj.server.Application"
+
+dependencies {
+
+    compile project(':proj-service')
+    compile project(':proj-grpc')
+
+
+    // guice
+    compile "com.google.inject:guice:${guice_version}"
+    compile('io.peggy:peggy-core:1.1.15') {
+        changing = true
+        exclude group:"org.jetbrains.kotlin"
+    }
+}

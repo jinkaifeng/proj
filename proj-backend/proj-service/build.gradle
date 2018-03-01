@@ -1,0 +1,7 @@
+
+dependencies {
+    compile project(':proj-dal')
+
+    // guice
+    compile "com.google.inject:guice:${guice_version}"
+}
