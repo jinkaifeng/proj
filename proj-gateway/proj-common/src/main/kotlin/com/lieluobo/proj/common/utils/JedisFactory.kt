@@ -1,7 +1,5 @@
 package com.lieluobo.proj.common.utils
 
-import com.google.common.collect.Lists
-
 object JedisFactory {
 
     /**
