@@ -7,12 +7,10 @@ import java.util.*
 
 
 object GsonBuilderUtil {
-    fun create(): Gson {
-        val gb = GsonBuilder()
-        gb.registerTypeAdapter(java.util.Date::class.java, DateSerializer()).setDateFormat(DateFormat.LONG)
-        gb.registerTypeAdapter(java.util.Date::class.java, DateDeserializer()).setDateFormat(DateFormat.LONG)
-        return gb.create()
-    }
+    val instance = GsonBuilder()
+            .registerTypeAdapter(java.util.Date::class.java, DateSerializer()).setDateFormat(DateFormat.LONG)
+            .registerTypeAdapter(java.util.Date::class.java, DateDeserializer()).setDateFormat(DateFormat.LONG)
+            .create()!!
 }
 
 

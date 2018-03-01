@@ -11,7 +11,7 @@ import redis.clients.jedis.JedisPool
 import redis.clients.jedis.JedisPoolConfig
 
 
-class JedisHelper(var dbIndex: Int) {
+class JedisHelper(private var dbIndex: Int) {
 
     private val config = JedisPoolConfig()
 
@@ -25,7 +25,7 @@ class JedisHelper(var dbIndex: Int) {
         jedisPool = JedisPool(config, HL_REDIS_HOST, HL_REDIS_PORT, HL_REDIS_TIMEOUT, HL_REDIS_PASSWORD)
     }
 
-    private var gson: Gson = GsonBuilderUtil.create()
+    private var gson: Gson = GsonBuilderUtil.instance
 
     operator fun <T> get(key: String, classOfT: Class<T>): T? {
         jedisPool!!.resource.use {
