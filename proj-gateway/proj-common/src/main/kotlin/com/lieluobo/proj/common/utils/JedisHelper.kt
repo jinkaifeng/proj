@@ -1,5 +1,6 @@
 package com.lieluobo.proj.common.utils
 
+import com.google.common.collect.Maps
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lieluobo.proj.common.constant.Environment.HL_REDIS_HOST
@@ -27,6 +28,9 @@ class JedisHelper(private var dbIndex: Int) {
 
     private var gson: Gson = GsonBuilderUtil.instance
 
+    /**
+     * 取得指定类型
+     */
     operator fun <T> get(key: String, classOfT: Class<T>): T? {
         jedisPool!!.resource.use {
             it.select(dbIndex)
@@ -37,6 +41,9 @@ class JedisHelper(private var dbIndex: Int) {
         }
     }
 
+    /**
+     * 取得列表
+     */
     fun <T> getArray(key: String): List<T>? {
         val s = get(key)
         if (StringUtils.isEmpty(s))
@@ -44,6 +51,9 @@ class JedisHelper(private var dbIndex: Int) {
         return gson.fromJson(s, object : TypeToken<List<T>>() {}.type)
     }
 
+    /**
+     * 取得string
+     */
     operator fun get(key: String): String? {
         jedisPool!!.resource.use {
             it.select(dbIndex)
@@ -54,6 +64,9 @@ class JedisHelper(private var dbIndex: Int) {
         }
     }
 
+    /**
+     * 设置任何类型
+     */
     operator fun set(key: String, obj: Any) {
         jedisPool!!.resource.use { jedis ->
             jedis.select(1)
@@ -61,10 +74,16 @@ class JedisHelper(private var dbIndex: Int) {
         }
     }
 
+    /**
+     * 设置任何类型 在指定时间内过期
+     */
     operator fun set(key: String, obj: Any, expireInSeconds: Int) {
         set(key, gson.toJson(obj), expireInSeconds)
     }
 
+    /**
+     * 设置string 在指定时间内过期
+     */
     operator fun set(key: String, value: String, expireInSeconds: Int) {
         jedisPool!!.resource.use { jedis ->
             jedis.select(dbIndex)
@@ -73,9 +92,142 @@ class JedisHelper(private var dbIndex: Int) {
         }
     }
 
+    /**
+     * 删除key
+     */
     fun del(key: String) {
-        jedisPool!!.resource.select(dbIndex)
-        jedisPool!!.resource.del(key)
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            it.del(key)
+        }
+    }
+
+    fun hSet(key: String, field: String, obj: Any) {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            it.hset(key, field, gson.toJson(obj))
+        }
+    }
+
+    fun hSet(key: String, field: String, obj: Any, expireInSeconds: Int) {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            it.expire(key, expireInSeconds)
+            it.hset(key, field, gson.toJson(obj))
+        }
+    }
+
+    fun <T> hGet(key: String, field: String, classOfT: Class<T>): T? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            val s = it.hget(key, field)
+            if (StringUtils.isEmpty(s)) {
+                return null
+            }
+            return gson.fromJson(s, classOfT)
+        }
+    }
+
+    fun hGet(key: String, field: String): String? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            val s = it.hget(key, field)
+            if (StringUtils.isEmpty(s)) {
+                return null
+            }
+            return s
+        }
+    }
+
+    fun hdel(key: String, field: String) {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            it.hdel(key, field)
+        }
+    }
+
+    fun <T> hGetArray(key: String, field: String): T? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            val s = it.hget(key, field)
+            if (StringUtils.isEmpty(s)) {
+                return null
+            }
+            return gson.fromJson(s, object : TypeToken<List<T>>() {}.type)
+        }
+    }
+
+    fun <T> hGetAll(key: String, classOfT: Class<T>): Map<String, T>? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            val s = it.hgetAll(key)
+            if (s.isEmpty()) {
+                return null
+            }
+            var map = Maps.newLinkedHashMap<String, T>()
+            s.map { map.put(it.key, gson.fromJson(it.value, classOfT)) }
+            return map
+        }
+    }
+
+    fun hGetAll(key: String): Map<String, String>? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            val s = it.hgetAll(key)
+            if (s.isEmpty()) {
+                return null
+            }
+            return s
+        }
+    }
+
+    fun <T> hGetAllArray(key: String): Map<String, List<T>>? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            val s = it.hgetAll(key)
+            if (s.isEmpty()) {
+                return null
+            }
+            val map = Maps.newLinkedHashMap<String, List<T>>()
+            s.map { map.put(it.key, gson.fromJson(it.value, object : TypeToken<List<T>>() {}.type)) }
+            return map
+        }
+    }
+
+    fun lPush(key: String, obj: Any) {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            it.lpush(key, gson.toJson(obj))
+        }
+    }
+
+    fun <T> rPop(key: String, classOfT: Class<T>): T? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            val s = it.rpop(key)
+            if (StringUtils.isEmpty(s)) {
+                return null
+            }
+            return gson.fromJson(s, classOfT)
+        }
+    }
+
+    fun rPop(key: String): String? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            return it.rpop(key)
+        }
+    }
+
+    fun <T> rPopArray(key: String): List<T>? {
+        jedisPool!!.resource.use {
+            it.select(dbIndex)
+            val s = it.rpop(key)
+            if (s.isEmpty()) {
+                return null
+            }
+            return gson.fromJson(s, object : TypeToken<List<T>>() {}.type)
+        }
     }
 
 }

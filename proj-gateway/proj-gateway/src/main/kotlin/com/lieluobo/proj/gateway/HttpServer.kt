@@ -6,6 +6,7 @@ import com.lieluobo.proj.common.constant.Environment.HL_SERVER_PORT
 import com.lieluobo.proj.gateway.filter.AccessRequestFilter
 import com.lieluobo.proj.gateway.filter.AccessResponseFilter
 import com.lieluobo.proj.gateway.module.ApplicationModule
+import com.lieluobo.proj.integration.module.IntegrationModule
 import org.glassfish.jersey.server.model.Resource
 
 
@@ -25,5 +26,5 @@ class TemplateConfig : JerseyResourceConfig() {
 }
 
 fun main(args: Array<String>) {
-    JerseyServer(TemplateConfig(), ApplicationModule()).start(HL_SERVER_PORT)
+    JerseyServer(TemplateConfig(), ApplicationModule(), IntegrationModule()).start(HL_SERVER_PORT)
 }

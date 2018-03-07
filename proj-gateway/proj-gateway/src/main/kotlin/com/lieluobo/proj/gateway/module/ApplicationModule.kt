@@ -17,13 +17,6 @@ import java.util.concurrent.TimeUnit
 class ApplicationModule : AbstractModule() {
     override fun configure() {
         bind(UserService::class.java).to(UserServiceImpl::class.java).`in`(Singleton::class.java)
-
-        // BD服务
-        val userChannel = channel("0.0.0.0", 11000, instance,
-                interceptors = listOf(
-                        TimeoutInterceptor(30, TimeUnit.SECONDS)))
-        bind(UserServiceGrpc.UserServiceBlockingStub::class.java)
-                .toInstance(UserServiceGrpc.newBlockingStub(userChannel))
     }
 
 }
